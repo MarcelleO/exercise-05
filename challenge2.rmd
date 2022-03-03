@@ -1,0 +1,26 @@
+---
+title: "challenge2"
+author: "Marcelle"
+date: "2/24/2022"
+output: html_document
+---
+
+```{r}
+#read in dataset and name as z 
+library(tidyverse)
+z <- "https://raw.githubusercontent.com/difiore/ada-2022-datasets/main/zombies.csv"
+d <- read_csv(f, col_names = TRUE)
+#Calculate the population mean and standard deviation for each quantitative random variable in the dataset (height, weight, age, number of zombies killed, and years of education)
+pop_var <- function(x){sum((x-mean(x))^2)/(length(x))}
+mean(height)
+mean(weight)
+mean(age)
+#Use {ggplot} and make boxplots of each of these variables by gender
+ggplot(d, aes(x, y))
+ +geom_boxplot(na.rm=TRUE)
+  facet_wrap(gender)
+
+
+
+
+```

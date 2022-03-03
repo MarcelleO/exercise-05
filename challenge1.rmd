@@ -1,0 +1,63 @@
+---
+title: "challenge1"
+author: "Marcelle"
+date: "2/22/2022"
+output: html_document
+---
+
+```{r}
+#Challenge1
+library(tidyverse)
+#read in IMDB data set
+f <- "https://raw.githubusercontent.com/difiore/ada-2022-datasets/main/IMDB-movies.csv"
+d <- read_csv(f, col_names = TRUE)
+#filter by decade
+d <- d %>% filter(startYear %in% 1920:1979 & runtimeMinutes %in% 60:180)%>%
+  mutate(decade=case_when(startYear<=1929~"20's", startYear <=1939~"30's", startYear <=1949~ "40's", startYear <=1959~"50's", startYear <=1969~"60's", startYear<= 1979~"70's"))
+#Use ggplot2 to plot the distribution of runtimeMinutes for each decade (use facet wrap)
+p <- ggplot(data=d, aes(x=runtimeMinutes))+geom_histogram()
+p<- p+facet_wrap(~decade)
+p
+#Use a one-line statement to calculate the population mean and population standard deviation in runtimeMinutes for each decade and save the results in a new dataframe called results
+results <- group_by(d, decade) %>%
+  summarize(mean=mean(runtimeMinutes, na.rm=TRUE), sd=sd(runtimeMinutes, na.rm=TRUE))
+
+#Draw a single sample of 100 movies, without replacement, from each decade and calculate the single sample mean and single sample standard deviation in runtimeMinutes for each decades.
+#select(d)
+x <- group_by(d,decade)%>%
+  sample_n(100, replace = FALSE)%>%
+summarise(mean=mean(runtimeMinutes, na.rm=TRUE), 
+          sd=sd(runtimeMinutes, na.rm=TRUE),
+          se=sd/sqrt(100))
+x
+#Compare these estimates to the actual population mean runtimeMinutes for each decade and to the calculated SE in the population mean for samples of size 100 based on the population standard deviation for each decade
+a<- left_join(results, x, by='decade')
+
+#Generate a sampling distribution of mean runtimeMinutes for each decade by [a] drawing 1000 samples of 100 movies from each decade and, for each sample, [b] calculating the mean runtimeMinutes and the standard deviation in runtimeMinutes for each decade
+# calculate the MEAN and the STANDARD DEVIATION of the sampling distribution of sample means for each decade and plot a histogram of the sampling distribution for each decade. What shape does it have?
+library(mosaic)
+reps <- 1000
+n <- 100
+s <- do(reps)*sample_n(group_by(d, decade), n, replace=FALSE)%>%
+  group_by(decade)%>%
+  summarise(samp_dist_mean=mean(runtimeMinutes, na.rm=TRUE), samp_dist_sd=sd(runtimeMinutes, na.rm=TRUE),
+se=samp_dist_sd/(sqrt100))
+#aggregate or calculate summary statistics for groups of observations in a data frame
+samp_mean <- aggregate(s$samp_dist_mean~s$decade, mean, data=s)
+samp_mean
+
+samp_sd <- aggregate(s$samp_dist_sd, by=list(s))
+  samp_sd
+#ggplot(data=s, aes(x=mean))+geom_histogram()+facet_wrap(~decade)
+
+
+ #the shape is a normal distribution
+
+
+# compare the standard error in runtimeMinutes for samples of size 100 from each decade [1] as estimated from your first sample of 100 movies, [2] as calculated from the known population standard deviations for each decade, and [3] as estimated from the sampling distribution of sample means for each decade.
+#use left join
+
+se_20s <- sd(s)
+b <- left_join(
+```
+
